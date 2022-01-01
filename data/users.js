@@ -1,14 +1,22 @@
 export const USERS = [
     {
-        name: 'tempname',
-        image: ''
+        user: 'Tempname',
+        image: 'user01.png'
     },
     {
-        name: 'testname',
-        image: ''
+        user: 'Testname',
+        image: 'user02.png'
     },
     {
-        name: 'valuename',
-        image: ''
+        user: 'Valuename',
+        image: 'user03.png'
     },
-]
+    {
+        user: 'Stringname',
+        image: 'user04.png'
+    },
+    {
+        user: 'Floatname',
+        image: 'user05.png'
+    },
+] 
