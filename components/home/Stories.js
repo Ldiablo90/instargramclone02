@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native'
-import { USERS } from '../data/users'
+import { USERS } from '../../data/users'
 
 const Stories = () => {
     return (
@@ -11,7 +11,7 @@ const Stories = () => {
             >
                 {USERS.map((story, index) => (
                     <View key={index}>
-                        <Image style={styles.story} source={require(`../assets/users/${story.image}`)} />
+                        <Image style={styles.story} source={require(`../../assets/users/${story.image}`)} />
                         <Text style={{ color: 'white', textAlign: 'center' }}>
                             {
                                 story.user.length > 6 ?
