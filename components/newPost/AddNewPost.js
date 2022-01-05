@@ -2,18 +2,18 @@ import React from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import FormikPostUploader from './FormikPostUploader'
 
-const AddNewPost = () => {
+const AddNewPost = ({navigation}) => {
     return (
         <View>
-            <Header />
-            <FormikPostUploader />
+            <Header navigation={navigation} />
+            <FormikPostUploader navigation={navigation} />
         </View>
     )
 }
 
-const Header = () => (
+const Header = ({navigation}) => (
     <View style={styles.headerContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Image
                     source={{ uri: 'https://img.icons8.com/ios-glyphs/90/ffffff/back.png' }}
                     style={{ width: 30, height: 30 }}

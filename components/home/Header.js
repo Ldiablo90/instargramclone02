@@ -1,7 +1,7 @@
 import React, { StrictMode } from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 
-const Header = () => {
+const Header = ({navigation}) => {
     return (
         <View style={styles.container}>
             <TouchableOpacity>
@@ -12,7 +12,7 @@ const Header = () => {
             </TouchableOpacity>
 
             <View style={styles.iconsContainer}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>navigation.push('NewPostScreen')}>
                     <Image
                         style={styles.icon}
                         source={{uri: "https://img.icons8.com/fluency-systems-regular/60/ffffff/plus-2-math.png"}}

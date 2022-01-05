@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 import { View, Text, Image, TextInput, Button } from 'react-native'
 import * as Yup from 'yup';
 import { Formik } from 'formik'
-
+import validUrl from 'valid-url'
 const uploadPostSchema = Yup.object().shape({
     imageUrl: Yup.string().url().required('A URL is required'),
     caption: Yup.string().max(2200, ' Caption has reached the charcter limit.')
 })
 
-const FormikPostUploader = () => {
+const FormikPostUploader = ({navigation}) => {
     const PLACEHOLDER_IMG = 'https://picsum.photos/id/1/200'
 
     const [thumbnailUrl, setThumbnailUrl] = useState(PLACEHOLDER_IMG)
@@ -16,7 +16,10 @@ const FormikPostUploader = () => {
     return (
         <Formik
             initialValues={{ caption: '', inageUrl: '' }}
-            onSubmit={(values) => console.log(values)}
+            onSubmit={(values) => {
+                console.log(values);
+                navigation.goBack();
+            }}
             validationSchema={uploadPostSchema}
             validateOnMount={true}
         >
@@ -30,7 +33,7 @@ const FormikPostUploader = () => {
                         }}
                     >
                         <Image
-                            source={{ uri: thumbnailUrl ? thumbnailUrl : PLACEHOLDER_IMG }}
+                            source={{ uri: validUrl.isUri(thumbnailUrl) ? thumbnailUrl : PLACEHOLDER_IMG }}
                             style={{ width: 100, height: 100 }}
                         />
                         <View style={{ flex: 1 }}>
