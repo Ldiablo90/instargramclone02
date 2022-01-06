@@ -1,22 +1,42 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, StyleSheet, Pressable, TouchableOpacity, Alert } from 'react-native'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import Validator from 'email-validator'
+import firebase from '../../firebase'
 
 const LoginForm = ({navigation}) => {
     const LoginFormSchema = Yup.object().shape({
         email: Yup.string().email().required('An email is required'),
-        password: Yup.string().required().min(8, 'Your password has to have at least 8 characters')
+        password: Yup.string().required().min(6, 'Your password has to have at least 8 characters')
     })
 
+    const onLogin = async (email, password) => {
+        try {
+            await firebase.auth().signInWithEmailAndPassword(email,password);
+            console.log('firebaseLogin Successful')
+        } catch (err) {
+            Alert.alert(
+                "Alert Title",
+                "My Alert Msg",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => console.log("OK Pressed") }
+                ]
+              )
+        }
+    }
 
     return (
         <View style={styles.wrapper}>
             <Formik
                 initialValues={{ email: '', password: '' }}
                 onSubmit={values => {
-                    console.log(values)
+                    onLogin(values.email, values.password)
                 }}
                 validationSchema={LoginFormSchema}
                 validateOnMount={true}
@@ -37,7 +57,7 @@ const LoginForm = ({navigation}) => {
                             />
                         </View>
                         <View style={[styles.inputField, {
-                            borderColor: !values.password.length && values.password.length > 7 ? '#bbb':'red'
+                            borderColor: !values.password.length && values.password.length > 5 ? '#bbb':'red'
                         }]}>
                             <TextInput
                                 placeholder='Password'
