@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, Pressable, TouchableOpacity, Alert }
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import Validator from 'email-validator'
-import firebase from '../../firebase'
+import { firebase } from '../../firebase'
 
 const LoginForm = ({navigation}) => {
     const LoginFormSchema = Yup.object().shape({
@@ -16,19 +16,9 @@ const LoginForm = ({navigation}) => {
             await firebase.auth().signInWithEmailAndPassword(email,password);
             console.log('firebaseLogin Successful')
         } catch (err) {
-            Alert.alert(
-                "Alert Title",
-                "My Alert Msg",
-                [
-                  {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                  },
-                  { text: "OK", onPress: () => console.log("OK Pressed") }
-                ]
-              )
-        }
+            alert(
+                err.message,
+            )}
     }
 
     return (
@@ -57,7 +47,7 @@ const LoginForm = ({navigation}) => {
                             />
                         </View>
                         <View style={[styles.inputField, {
-                            borderColor: !values.password.length && values.password.length > 5 ? '#bbb':'red'
+                            borderColor: !values.password.length || values.password.length > 5 ? '#bbb':'red'
                         }]}>
                             <TextInput
                                 placeholder='Password'
