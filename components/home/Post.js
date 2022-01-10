@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Divider } from 'react-native-elements'
+
+import { firebase, db } from '../../firebase'
 
 const postFooterIcons = [
     {
@@ -23,13 +25,30 @@ const postFooterIcons = [
 ]
 
 const Post = ({ post }) => {
+
+    const handleLike = post => {
+        const currentLikeStatus = !post.likes_by_users.includes(
+            firebase.auth().currentUser.email
+        )
+        db.collection('users')
+            .doc(post.owner_email)
+            .collection('posts')
+            .doc(post.id)
+            .update({
+                likes_by_users: currentLikeStatus ?
+                    firebase.firestore.FieldValue.arrayUnion(firebase.auth().currentUser.email)
+                    : firebase.firestore.FieldValue.arrayRemove(firebase.auth().currentUser.email)
+            })
+            .then(() => { })
+    }
+
     return (
         <View style={{ marginBottom: 30 }}>
             <Divider width={1} orientation='vertical' />
             <PostHeader post={post} />
             <PostImage post={post} />
             <View style={{ marginHorizontal: 15, marginTop: 10 }}>
-                <PostFooter post={post} />
+                <PostFooter post={post} handleLike={handleLike} />
                 <Likes post={post} />
                 <Caption post={post} />
                 <CommentsSection post={post} />
@@ -53,10 +72,16 @@ const PostImage = ({ post }) => (
         <Image source={require(`../../assets/posts/${post.imageUrl}`)} style={{ height: '100%', resizeMode: 'cover' }} />
     </View>
 )
-const PostFooter = ({ post }) => (
+const PostFooter = ({ handleLike, post }) => (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <View style={styles.leftfooterIconsContainer}>
-            <Icon imgStyle={styles.footerIcon} imgUrl={postFooterIcons[0].imageUrl}></Icon>
+            <TouchableOpacity onPress={()=>handleLike(post)}>
+                <Image
+                    style={styles.footerIcon}
+                    source={{ uri: postFooterIcons[0].imageUrl }}
+                />
+
+            </TouchableOpacity>
             <Icon imgStyle={styles.footerIcon} imgUrl={postFooterIcons[1].imageUrl}></Icon>
             <Icon imgStyle={styles.footerIcon} imgUrl={postFooterIcons[2].imageUrl}></Icon>
 
@@ -105,8 +130,10 @@ const CommentsSection = ({ post }) => (
 const Comments = ({ post }) => (
     <>
         {post.comments.map((comment, index) => (
-            <View style={{flexDirection:'row',
-             marginTop:5}} key={index}>
+            <View style={{
+                flexDirection: 'row',
+                marginTop: 5
+            }} key={index}>
                 <Text style={{ color: 'white' }}>
                     <Text style={{ fontWeight: '600' }}>{comment.user}</Text>
                     <Text> {comment.comment}</Text>

@@ -1,24 +1,66 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, Image, TextInput, Button } from 'react-native'
 import * as Yup from 'yup';
 import { Formik } from 'formik'
 import validUrl from 'valid-url'
+import { firebase, db } from '../../firebase'
+
+
 const uploadPostSchema = Yup.object().shape({
     imageUrl: Yup.string().url().required('A URL is required'),
     caption: Yup.string().max(2200, ' Caption has reached the charcter limit.')
 })
 
-const FormikPostUploader = ({navigation}) => {
+const FormikPostUploader = ({ navigation }) => {
     const PLACEHOLDER_IMG = 'https://picsum.photos/id/1/200'
 
     const [thumbnailUrl, setThumbnailUrl] = useState(PLACEHOLDER_IMG)
+    const [currentLoggedInUser, setCurrentLoggedInUser] = useState(null)
+
+    const getUsername = () => {
+        const user = firebase.auth().currentUser
+        const unsubscribe = db
+            .collection('user')
+            .where('owner_uid', '==', user.uid)
+            .limit(1)
+            .onSnapshot(snapshot => snapshot.docs.map(doc => {
+                setCurrentLoggedInUser({
+                    username: doc.data().username,
+                    profilePicture: doc.data().profile_picture,
+                })
+            }))
+        return unsubscribe
+    }
+
+    useEffect(() => {
+        getUsername()
+    }, [])
+    const uploadPostToFire = (imageUrl, caption) => {
+        const unsubscribe = db
+            .collection('users')
+            .doc(firebase.auth().currentUser.email)
+            .collection('posts')
+            .add({
+                imageUrl: imageUrl,
+                user: currentLoggedInUser.username,
+                profile_picture: currentLoggedInUser.profilePicture,
+                owren_uid: firebase.auth().currentUser.uid,
+                caption: caption,
+                createAt: firebase.firestore.FieldValue.serverTimestamp(),
+                likes: 0,
+                like_by_users: [],
+                comments: []
+            })
+            .then(()=> navigation.goBack())
+            .catch(err => console.log(err.message))
+        return unsubscribe
+    }
 
     return (
         <Formik
             initialValues={{ caption: '', inageUrl: '' }}
             onSubmit={(values) => {
-                console.log(values);
-                navigation.goBack();
+                uploadPostToFire(values.inageUrl, values.caption)
             }}
             validationSchema={uploadPostSchema}
             validateOnMount={true}
